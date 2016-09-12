@@ -1,9 +1,2 @@
 # Team-HK-Project
-Prodick for CS441 for Fall 2016 at California State University of San Marcossd
-Pretty colors
-<<<<<<< HEADsd
-HI EVERYBODY LETS GO TO HONG KONGds
-=======ds
-
-HELLO WORLD - OMID
-I MADE A CHANGE BEFORE GRAHAM PULLS
+Project for CS441 for Fall 2016 at California State University of San Marco
