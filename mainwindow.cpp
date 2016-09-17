@@ -1,5 +1,9 @@
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
+#include "qtftp/src/qftp/qftp.h"
+#include "qtftp/src/qftp/qurlinfo.h"
+
+#include <QUrl>
 #include <QDebug>
 #include <string>
 using namespace std;
@@ -164,6 +168,13 @@ MainWindow::MainWindow(QWidget *parent): QMainWindow(parent), ui(new Ui::MainWin
 
 /**********************************************************************************************************************************************************************/
 
+
+    //doc.qt.io/qt-4.8/qt-network-qftp-example.html
+    qDebug() << "QFTP ---------";
+    QFtp *ftp;
+    QUrl url(this->ui->host_Label->text());
+
+    //ftp->connectToHost()
 }
 
 MainWindow::~MainWindow()
