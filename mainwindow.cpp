@@ -39,7 +39,6 @@ MainWindow::MainWindow(QWidget *parent): QMainWindow(parent), ui(new Ui::MainWin
     QString hostLabelName = "HOST/IP:";
     this->ui->host_Label->setText(hostLabelName);
 
-
     /*********************DEBUG***************************************************************************************/
 
     qDebug() << "Host Label Pixel Size = " << hostNameFontProperties.pixelSize() << "px";
@@ -112,8 +111,10 @@ MainWindow::MainWindow(QWidget *parent): QMainWindow(parent), ui(new Ui::MainWin
     hostTextInputFontProperties.setPixelSize(25);
     this->ui->textInput_Host->setFont(hostTextInputFontProperties);
 
-    QString hostTextInputDefaultLabelName = "127.0.0.1";
-    this->ui->textInput_Host->setText(hostTextInputDefaultLabelName);
+    //QString hostTextInputDefaultLabelName = "127.0.0.1";
+    //this->ui->textInput_Host->setText(hostTextInputDefaultLabelName);
+
+    QString hostTextInputFromUser = this->ui->textInput_Host->text();
 
     /*********************DEBUG***************************************************************************************/
 
@@ -163,10 +164,20 @@ MainWindow::MainWindow(QWidget *parent): QMainWindow(parent), ui(new Ui::MainWin
 
 /**********************************************************************************************************************************************************************/
 
-
 }
 
 MainWindow::~MainWindow()
 {
     delete ui;
+}
+
+void MainWindow::on_textInput_Host_textChanged(const QString &arg1)
+{
+    static bool didUserChangeHostTextInput = false;
+    if(didUserChangeHostTextInput == false)
+    {
+        this->ui->progressBar->setValue(this->ui->progressBar->value() + 25);
+        didUserChangeHostTextInput = true;
+    }
+
 }

@@ -105,7 +105,7 @@
     </property>
     <property name="dateTime">
      <datetime>
-      <hour>3</hour>
+      <hour>10</hour>
       <minute>24</minute>
       <second>30</second>
       <year>2016</year>
@@ -126,7 +126,7 @@
    <widget class="QLabel" name="host_Label">
     <property name="geometry">
      <rect>
-      <x>350</x>
+      <x>340</x>
       <y>160</y>
       <width>131</width>
       <height>51</height>
