@@ -1,2 +1,2 @@
-# Team-HK-Project
-Project for CS441 for Fall 2016 at California State University of San Marco
+# TEAM-HK Project for CS441
+Ftp Client
