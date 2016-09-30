@@ -5,16 +5,19 @@ from kivy.uix.label import Label
 from kivy.config import Config
 from kivy.uix.button import Button
 from ftplib import FTP
+from kivy.uix.screenmanager import ScreenManager, Screen
 
 
-class LoginScreen(GridLayout):
+class LoginScreen(GridLayout,Screen):
 
 	def ConnectUsingParameters(self, instance):
 		self.output.text = "Connecting..."
 		try:
-			ftp = FTP(self.host.text)
+			ftp = FTP()
+			ftp.connect(self.host.text,self.port.text)
 			messageReceived = ftp.login(self.username.text, self.password.text)
 			print "FTP returned: {}".format(messageReceived)
+			sm.current = 'transfer'
 		except Exception, e:
 			print "[ERROR] FTP connection failed with error: {}".format(e)
 
@@ -22,9 +25,10 @@ class LoginScreen(GridLayout):
 		self.output.text = "Connecting..."
 		try:
 			ftp = FTP()
-			ftp.connect('localhost','22')
+			ftp.connect('localhost','21')
 			messageReceived = ftp.login('IEUser', 'test')
 			print "FTP returned: {}".format(messageReceived)
+			sm.current = 'transfer'
 		except Exception, e:
 			print "[ERROR] FTP connection failed with error: {}".format(e)
 
@@ -32,8 +36,6 @@ class LoginScreen(GridLayout):
 		#TODO: Seperate these elements into a nicer format
 
 		#Set the login screen size
-		Config.set('graphics', 'width', '400')
-		Config.set('graphics', 'height', '150')
 
 		super(LoginScreen, self).__init__(**kwargs)
 		self.cols = 2
@@ -66,10 +68,24 @@ class LoginScreen(GridLayout):
 		connectButton.bind(on_press=self.ConnectUsingDefaultParameters)
 		self.add_widget(connectButton)
 
+class TransferScreen(Screen):
+	def __init__(self, **kwargs):
+
+		super(TransferScreen, self).__init__(**kwargs)
+
+		self.add_widget(Label(text='Screen 2'))
+		self.host = TextInput(multiline=False)
+		self.add_widget(self.host)
+
+
+sm = ScreenManager()
+sm.add_widget(LoginScreen(name = 'login'))
+sm.add_widget(TransferScreen(name = 'transfer'))
+
 class FtpClient(App):
 
 	def build(self):
-		return LoginScreen()
+		return sm
 
 
 if __name__ == '__main__':
