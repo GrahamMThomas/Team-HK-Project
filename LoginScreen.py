@@ -9,6 +9,8 @@ from Settings import *
 
 class LoginScreen(GridLayout, Screen):
     def ConnectUsingParameters(self, instance):
+        if self.host.text == '':
+            self.SetDefaultParameters(self)
         self.output.text = "Connecting..."
         try:
             ftp = FTP()
@@ -20,12 +22,11 @@ class LoginScreen(GridLayout, Screen):
         except Exception, e:
             print "[ERROR] FTP connection failed with error: {}".format(e)
 
-    def ConnectUsingDefaultParameters(self, instance):
+    def SetDefaultParameters(self, instance):
         self.host.text = 'localhost'
         self.port.text = '21'
         self.username.text = 'IEUser'
         self.password.text = 'test'
-        self.ConnectUsingParameters(self)
 
     def __init__(self, **kwargs):
         #TODO: Seperate these elements into a nicer format
@@ -42,6 +43,7 @@ class LoginScreen(GridLayout, Screen):
         # Creating Port Field
         self.add_widget(Label(text='Port'))
         self.port = TextInput(multiline=False)
+        self.port.text = '21'
         self.add_widget(self.port)
 
         # Creating Username Field
@@ -58,5 +60,5 @@ class LoginScreen(GridLayout, Screen):
         self.output = Label()
         self.add_widget(self.output)
         connectButton = Button(text='Connect')
-        connectButton.bind(on_press=self.ConnectUsingDefaultParameters)
+        connectButton.bind(on_press=self.ConnectUsingParameters)
         self.add_widget(connectButton)
