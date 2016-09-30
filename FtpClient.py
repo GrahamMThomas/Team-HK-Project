@@ -21,13 +21,16 @@ class LoginScreen(GridLayout):
 	def ConnectUsingDefaultParameters(self, instance):
 		self.output.text = "Connecting..."
 		try:
-			ftp = FTP('localhost')
+			ftp = FTP()
+			ftp.connect('localhost','22')
 			messageReceived = ftp.login('IEUser', 'test')
 			print "FTP returned: {}".format(messageReceived)
 		except Exception, e:
 			print "[ERROR] FTP connection failed with error: {}".format(e)
 
 	def __init__(self, **kwargs):
+		#TODO: Seperate these elements into a nicer format
+
 		#Set the login screen size
 		Config.set('graphics', 'width', '400')
 		Config.set('graphics', 'height', '150')
