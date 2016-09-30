@@ -1,12 +1,9 @@
 from kivy.uix.gridlayout import GridLayout
 from kivy.uix.textinput import TextInput
-from kivy.app import App
 from kivy.uix.label import Label
-from kivy.config import Config
 from kivy.uix.button import Button
 from ftplib import FTP
-from kivy.uix.screenmanager import ScreenManager, Screen
-from time import sleep
+from kivy.uix.screenmanager import Screen
 
 from Settings import *
 
@@ -19,7 +16,6 @@ class LoginScreen(GridLayout, Screen):
             messageReceived = ftp.login(self.username.text, self.password.text)
             print "FTP returned: {}".format(messageReceived)
             self.output.text = 'Connected.'
-            sleep(2)
             sm.current = 'transfer'
         except Exception, e:
             print "[ERROR] FTP connection failed with error: {}".format(e)
