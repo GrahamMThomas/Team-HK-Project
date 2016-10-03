@@ -2,25 +2,19 @@ from kivy.uix.gridlayout import GridLayout
 from kivy.uix.textinput import TextInput
 from kivy.uix.label import Label
 from kivy.uix.button import Button
-from ftplib import FTP
 from kivy.uix.screenmanager import Screen
 
 from Settings import *
+from HKftp import *
 
 class LoginScreen(GridLayout, Screen):
     def ConnectUsingParameters(self, instance):
         if self.host.text == '':
             self.SetDefaultParameters(self)
         self.output.text = "Connecting..."
-        try:
-            ftp = FTP()
-            ftp.connect(self.host.text, int(self.port.text))
-            messageReceived = ftp.login(self.username.text, self.password.text)
-            print "FTP returned: {}".format(messageReceived)
-            self.output.text = 'Connected.'
+        ftpResult = HKftp.HKConnect(self.host.text, self.port.text, self.username.text, self.password.text)
+        if ftpResult:
             sm.current = 'transfer'
-        except Exception, e:
-            print "[ERROR] FTP connection failed with error: {}".format(e)
 
     def SetDefaultParameters(self, instance):
         self.host.text = 'localhost'
@@ -29,7 +23,7 @@ class LoginScreen(GridLayout, Screen):
         self.password.text = 'test'
 
     def __init__(self, **kwargs):
-        #TODO: Seperate these elements into a nicer format
+        #TODO: Separate these elements into a nicer format
 
         # Set the login screen size
         super(LoginScreen, self).__init__(**kwargs)
