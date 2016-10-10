@@ -4,17 +4,25 @@ from kivy.uix.label import Label
 from kivy.uix.button import Button
 from kivy.uix.screenmanager import Screen
 
+from TransferScreen import TransferScreen
 from Settings import *
 from HKftp import *
 
 class LoginScreen(GridLayout, Screen):
     def ConnectUsingParameters(self, instance):
-        if self.host.text == '':
+        if self.host.text == '': #If no host is selected use default.
             self.SetDefaultParameters(self)
-        self.output.text = "Connecting..."
         ftpResult = HKftp.HKConnect(self.host.text, self.port.text, self.username.text, self.password.text)
         if ftpResult:
-            sm.current = 'transfer'
+            self.SwitchToTransferScreen()
+
+    @staticmethod
+    def SwitchToTransferScreen():
+        print "Switching to Transfer Screen..."
+        transferScreen = TransferScreen(name='transfer')
+        transferScreen.OnSwitch()
+        sm.add_widget(transferScreen)
+        sm.current = 'transfer'
 
     def SetDefaultParameters(self, instance):
         self.host.text = 'localhost'
