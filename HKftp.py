@@ -1,29 +1,30 @@
-from ftplib import FTP
-from kivy.core.window import Window
+from ftplib import FTP 
+from kivy.core.window import Window 
 
-#TODO: Determine if this is the best way to deal with persistent ftp objects
 
-class HKftp:
-    ftp = FTP()
+#TODO: Determine if this is the best way to deal with persistent ftp objects 
 
-    @classmethod
-    def HKConnect(cls, host, port, username, password):
-        try:
-            cls.ftp.connect(host, int(port))
-            messageReceived = cls.ftp.login(username, password)
-            print "FTP returned: {}".format(messageReceived)
-            Window.size = (500, 500) #Change window size if connection successful
-            return True
-        except Exception, e:
-            print "[ERROR] FTP connection failed with error: {}".format(e)
-            return False
 
-    @classmethod
-    def HKList(cls, directory = '/'):
-        output = cls.ftp.nlst(directory)
-        return output
+class FTPConnectionService: 
+	ftp = FTP() 
+	
+	@classmethod 
+	def ConnectToFtpServer(self, host, port, username, password): 
+		try: 
+			self.ftp.connect(host, int(port)) 
+			messageReceivedForLoginInformation = self.ftp.login(username, password) 
+			print "FTP login received: {}".format(messageReceivedForLoginInformation) 
+			return True 
+		except Exception, e: 
+			print "[ERROR] FTP connection failed with error: {}".format(e) 
+			return False 
 
-    #TODO: Add more methods here!
+	@classmethod 
+	def FtpListCommand(self, directory = '/'): 
+		output = self.ftp.nlst(directory) 
+		return output 
 
-    def __init__(self):
-        pass
+  #TODO: Add more methods here! 
+
+def __init__(self): 
+	pass 
