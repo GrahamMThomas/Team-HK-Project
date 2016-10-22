@@ -7,7 +7,8 @@ from kivy.core.window import Window
 
 class FTPConnectionService: 
 	ftp = FTP() 
-	
+	ftpDirectory = '/'
+
 	@classmethod 
 	def ConnectToFtpServer(self, host, port, username, password): 
 		try: 
@@ -22,7 +23,12 @@ class FTPConnectionService:
 	@classmethod 
 	def FtpListCommand(self, directory = '/'):
 		ls = []
-		self.ftp.retrlines('LIST %s' % directory, ls.append)
+		if directory[-1] == '/':
+			self.ftp.retrlines('LIST %s' % directory, ls.append)
+			self.ftpDirectory = directory
+		else:
+			self.ftp.retrlines('LIST', ls.append)
+			self.ftpDirectory = '/'
 		return self.ListParser(ls)
 
 	@classmethod
@@ -35,6 +41,17 @@ class FTPConnectionService:
 			else:
 				files.append(fileProperties[3])
 		return files
+
+	@classmethod
+	def Download(self, filename, destinationDir):
+		if destinationDir[-1] != '\\':
+			destinationDir += '\\'
+		print "Downloading {0} to {1}{0}".format(filename.split('/')[-1],destinationDir)
+		print self.ftp.retrbinary('RETR %s' % filename, open('{1}{0}'.format(filename.split('/')[-1], destinationDir), 'wb').write)
+
+	@classmethod
+	def GetCurrentDirectory(self):
+		return self.ftpDirectory
 
 	#TODO: Add more methods here!
 

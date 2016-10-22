@@ -15,8 +15,19 @@ UPLOADBUTTON = Button()
 DOWNLOADBUTTON = Button()
 LISTVIEW = ListView()
 LISTADAPTER = ListAdapter(data=[], cls=ListItemButton, sortedKeys=[])
+FILECHOOSER = FileChooserIconView(path="C:\\Users\\IEUser\\Desktop\\")
 
-class TransferScreen(GridLayout, Screen): 
+class TransferScreen(GridLayout, Screen):
+
+	def DownloadFile(self, instance = None):
+		if LISTADAPTER.selection:
+			filename =  FTPConnectionService.GetCurrentDirectory() + (str(LISTADAPTER.selection[0]).split('=')[1])[0:-1]
+			FTPConnectionService.Download(filename,FILECHOOSER.path)
+		else:
+			print "Error: No file selected"
+
+
+	#-------------------------------------------FTP DIRECTORY----------------------------------
 	def ListFiles(self, directory = '/', instance = None):
 		#TODO: Add formatting here
 		if LISTADAPTER.selection:
@@ -32,7 +43,7 @@ class TransferScreen(GridLayout, Screen):
 		UPLOADBUTTON = Button(text='>>>>', on_press=self.ListFiles, size_hint_y=None, height=50)
 		self.add_widget(UPLOADBUTTON)
 
-		DOWNLOADBUTTON = Button(text='<<<<', on_press=self.ListFiles, size_hint_y=None, height=50)
+		DOWNLOADBUTTON = Button(text='<<<<', on_press=self.DownloadFile, size_hint_y=None, height=50)
 		self.add_widget(DOWNLOADBUTTON)
 
 	def UpdateFtpDirectoryListing(self, instance = None):
@@ -74,9 +85,8 @@ class TransferScreen(GridLayout, Screen):
 		
 		self.listButton = Button(text='List Files', on_press=self.UpdateFtpDirectoryListing, size_hint_y=None, height = 50)
 		self.add_widget(self.listButton) 
- 
-		self.fileChooser = FileChooserIconView(path="C:\\Users\\IEUser\\Desktop\\") 
-		self.add_widget(self.fileChooser)
+
+		self.add_widget(FILECHOOSER)
 
 		updateList = self.ListFiles()
 		LISTADAPTER = ListAdapter(data=["{}".format(i) for i in updateList], cls=ListItemButton, sortedKeys=[])
