@@ -24,7 +24,7 @@ class FTPConnectionService:
 		output = self.ftp.nlst(directory) 
 		return output 
 
-  #TODO: Add more methods here! 
+	#TODO: Add more methods here!
 
 def __init__(self): 
 	pass 

@@ -13,19 +13,19 @@ from kivy.uix.button import Button
 class TransferScreen(GridLayout, Screen): 
 	def ListFiles(self, instance = None): 
 		#TODO: Add formatting here 
-		return HKftp.FtpListCommand() 
+		return FTPConnectionService.FtpListCommand()
  
- 	def OnSwitch(self): 
+	def OnSwitch(self):
 		#TODO: Add more method needed on screen switch 
 		self.SetClientList() 
 		
- 	def SetClientList(self): 
+	def SetClientList(self):
 		output = self.ListFiles() 
 		list_adapter = ListAdapter(data=["{}".format(i) for i in output], cls=ListItemButton, sortedKeys=[]) 
 		list_view = ListView(adapter=list_adapter) 
 		self.add_widget(list_view) 
 
- 	#TODO: Implement screen design 
+	#TODO: Implement screen design
  	def __init__(self, **kwargs): 
 		super(TransferScreen, self).__init__(**kwargs) 
 		
