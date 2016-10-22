@@ -16,9 +16,10 @@ DOWNLOADBUTTON = Button()
 LISTVIEW = ListView()
 
 class TransferScreen(GridLayout, Screen): 
-	def ListFiles(self, instance = None): 
-		#TODO: Add formatting here 
-		return FTPConnectionService.FtpListCommand()
+	def ListFiles(self, directory = '/', instance = None):
+		#TODO: Add formatting here
+		output = FTPConnectionService.FtpListCommand(directory)
+		return output
 
 	def ReAddButtons(self,instance = None):
 		global UPLOADBUTTON
