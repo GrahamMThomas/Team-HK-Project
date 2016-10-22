@@ -14,11 +14,15 @@ from kivy.uix.button import Button
 UPLOADBUTTON = Button()
 DOWNLOADBUTTON = Button()
 LISTVIEW = ListView()
+LISTADAPTER = ListAdapter(data=[], cls=ListItemButton, sortedKeys=[])
 
 class TransferScreen(GridLayout, Screen): 
 	def ListFiles(self, directory = '/', instance = None):
 		#TODO: Add formatting here
-		output = FTPConnectionService.FtpListCommand(directory)
+		if LISTADAPTER.selection:
+			output = FTPConnectionService.FtpListCommand((str(LISTADAPTER.selection).split('=')[1])[0:-2])
+		else:
+			output = FTPConnectionService.FtpListCommand(directory)
 		return output
 
 	def ReAddButtons(self,instance = None):
@@ -35,14 +39,15 @@ class TransferScreen(GridLayout, Screen):
 		global LISTVIEW
 		global UPLOADBUTTON
 		global DOWNLOADBUTTON
+		global LISTADAPTER
 		# Removing old widgets
 		self.remove_widget(UPLOADBUTTON)
 		self.remove_widget(DOWNLOADBUTTON)
 		self.remove_widget(LISTVIEW)
 
 		updateList = self.ListFiles()
-		list_adapter = ListAdapter(data=["{}".format(i) for i in updateList], cls=ListItemButton, sortedKeys=[])
-		LISTVIEW = ListView(adapter=list_adapter)
+		LISTADAPTER = ListAdapter(data=["{}".format(i) for i in updateList], cls=ListItemButton, sortedKeys=[])
+		LISTVIEW = ListView(adapter=LISTADAPTER)
 		self.add_widget(LISTVIEW)
 		self.ReAddButtons()
 
@@ -59,6 +64,7 @@ class TransferScreen(GridLayout, Screen):
 		global LISTVIEW
 		global UPLOADBUTTON
 		global DOWNLOADBUTTON
+		global LISTADAPTER
 
 		super(TransferScreen, self).__init__(**kwargs) 
 		
@@ -73,8 +79,8 @@ class TransferScreen(GridLayout, Screen):
 		self.add_widget(self.fileChooser)
 
 		updateList = self.ListFiles()
-		list_adapter = ListAdapter(data=["{}".format(i) for i in updateList], cls=ListItemButton, sortedKeys=[])
-		LISTVIEW = ListView(adapter=list_adapter)
+		LISTADAPTER = ListAdapter(data=["{}".format(i) for i in updateList], cls=ListItemButton, sortedKeys=[])
+		LISTVIEW = ListView(adapter=LISTADAPTER)
 
 		self.UpdateFtpDirectoryListing()
 
