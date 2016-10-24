@@ -31,6 +31,7 @@ class FTPConnectionService:
 			self.ftpDirectory = '/'
 		return self.ListParser(ls)
 
+	# TODO: Fix parser so works on all servers
 	@classmethod
 	def ListParser(self, ls):
 		files = []
