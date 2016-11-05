@@ -41,10 +41,11 @@ class FTPConnectionService:
 		files = []
 		for FileListing in ls:
 			fileProperties = FileListing.split()
-			if fileProperties[2] == '<DIR>':
-				files.append("%s/" % fileProperties[3])
+			if fileProperties[2] == '<DIR>' or fileProperties[0][0] == 'd' :
+				files.append("%s/" % fileProperties[-1])
 			else:
-				files.append(fileProperties[3])
+				files.append(fileProperties[-1])
+			print(FileListing)
 		return files
 
 	@classmethod
