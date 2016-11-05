@@ -1,9 +1,13 @@
 from ftplib import FTP 
-from kivy.core.window import Window 
+from kivy.uix.popup import Popup
+from kivy.uix.actionbar import ActionBar
+from kivy.uix.actionbar import ActionView
+from kivy.uix.actionbar import ActionPrevious
+from kivy.uix.actionbar import ActionButton
 
+import sys
 
 #TODO: Determine if this is the best way to deal with persistent ftp objects 
-
 
 class FTPConnectionService: 
 	ftp = FTP() 
@@ -48,8 +52,21 @@ class FTPConnectionService:
 		if destinationDir[-1] != '\\':
 			destinationDir += '\\'
 		print "Downloading {0} to {1}{0}".format(filename.split('/')[-1],destinationDir)
-		print self.ftp.retrbinary('RETR %s' % filename, open('{1}{0}'.format(filename.split('/')[-1], destinationDir), 'wb').write)
-
+		try:
+			return self.ftp.retrbinary('RETR %s' % filename, open('{1}{0}'.format(filename.split('/')[-1], destinationDir), 'wb').write)
+		except IOError as err:
+			return err
+		
+	@classmethod
+	def Upload(self, filename, destinationDir):
+		fileToUpload = filename.split('\\')[-1]
+		print ("Uploading %s to %s")%(filename, destinationDir)
+		print ("Destination Directory = {}{}").format(destinationDir,fileToUpload)
+		f = open(filename, 'rb')
+		uploadCommandOutput = self.ftp.storbinary('STOR {}{}'.format(destinationDir, fileToUpload), f)
+		f.close()
+		return uploadCommandOutput
+			
 	@classmethod
 	def GetCurrentDirectory(self):
 		return self.ftpDirectory
