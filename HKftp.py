@@ -1,13 +1,22 @@
-from ftplib import FTP 
+from ftplib import FTP, error_perm 
 from kivy.uix.popup import Popup
 from kivy.uix.actionbar import ActionBar
 from kivy.uix.actionbar import ActionView
 from kivy.uix.actionbar import ActionPrevious
 from kivy.uix.actionbar import ActionButton
-
+from kivy.uix.label import Label
+from kivy.uix.boxlayout import BoxLayout
+from kivy.uix.button import Button
 import sys
 
-#TODO: Determine if this is the best way to deal with persistent ftp objects 
+def closePopup(self):
+	listingErrorPopup.dismiss()
+
+errorListingMessage = Label(text = "")
+listingBoxLayout = BoxLayout(orientation = 'vertical')
+listingBoxLayout.add_widget(errorListingMessage)
+listingBoxLayout.add_widget(Button(text = "OK", size_hint_y = .4, on_release = closePopup))
+listingErrorPopup = Popup(title = "Error: Listing", content = listingBoxLayout, size_hint = (.5,.4))
 
 class FTPConnectionService: 
 	ftp = FTP() 
@@ -28,8 +37,15 @@ class FTPConnectionService:
 	def FtpListCommand(self, directory = '/'):
 		ls = []
 		if directory[-1] == '/':
-			self.ftp.retrlines('LIST %s' % directory, ls.append)
-			self.ftpDirectory = directory
+			try:
+				self.ftp.retrlines('LIST %s' % directory, ls.append)
+				self.ftpDirectory = directory
+			except error_perm, msg:
+				errorListingMessage.text = ""
+				parsedErrorMessage = (str(msg)).split(" ")[1:]
+				for item in parsedErrorMessage:
+					errorListingMessage.text = errorListingMessage.text + str(item) + " "	
+				listingErrorPopup.open()
 		else:
 			self.ftp.retrlines('LIST', ls.append)
 			self.ftpDirectory = '/'
