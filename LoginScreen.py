@@ -61,8 +61,7 @@ class LoginScreen(GridLayout, Screen):
 			errorInformationMessage.text = "Information not Filled"
 			errorPopupLogin.title = "Error: EMPTY Fields"
 			errorPopupLogin.open()
-			
-					
+								
 	@staticmethod 
 	def SwitchToTransferScreen(): 
 		print "Switching to Transfer Screen..." 
@@ -87,11 +86,12 @@ class LoginScreen(GridLayout, Screen):
 		self.actionPrevious = ActionPrevious(title = "FTP Application 2016", with_previous = False, app_icon = "", app_icon_width = 1, app_icon_height = 0)
 		
 		self.actionToggleButton = ActionToggleButton(text = "CONNECTED", group = "ONLY", state = 'down', allow_selection = False,background_color = (1,.2,.2,1), disabled = True, color = (1,.2,.2,1), opacity = 2)
-		self.actionButton = ActionButton(text = "DEFAULT", on_press = self.SetDefaultParameters)
-		self.actionView.add_widget(self.actionButton)
-		self.actionBar.add_widget(self.actionView)
+		
 		self.actionView.add_widget(self.actionPrevious)
+		self.defaultButton = ActionButton(text = "DEFAULT", on_press = self.SetDefaultParameters)
+		self.actionView.add_widget(self.defaultButton)
 		self.actionView.add_widget(self.actionToggleButton)
+		self.actionBar.add_widget(self.actionView)
 		self.add_widget(self.actionBar)
 		
 		self.boxlayoutApplicationHeader = BoxLayout(padding = [20,0,0,20],orientation = "vertical",cols = 1)
