@@ -8,6 +8,7 @@ from kivy.uix.label import Label
 from kivy.uix.boxlayout import BoxLayout
 from kivy.uix.button import Button
 import sys
+import io
 
 def closePopup(self):
 	listingErrorPopup.dismiss()
@@ -55,13 +56,13 @@ class FTPConnectionService:
 	@classmethod
 	def ListParser(self, ls):
 		files = []
-		for FileListing in ls:
-			fileProperties = FileListing.split()
-			if fileProperties[2] == '<DIR>' or fileProperties[0][0] == 'd' :
+		for iteratorInFileListing in ls:
+			fileProperties = iteratorInFileListing.split()
+			if fileProperties[2] == '<DIR>' or fileProperties[0][0] == 'd':
 				files.append("%s/" % fileProperties[-1])
 			else:
 				files.append(fileProperties[-1])
-			print(FileListing)
+			print(iteratorInFileListing)
 		return files
 
 	@classmethod
@@ -82,13 +83,18 @@ class FTPConnectionService:
 		f = open(filename, 'rb')
 		uploadCommandOutput = self.ftp.storbinary('STOR {}{}'.format(destinationDir, fileToUpload), f)
 		f.close()
+		
+		return uploadCommandOutput
+	
+	@classmethod
+	def thisUpload(self, filename, destinationDir):
+		bio = io.BytesIO('')
+		uploadCommandOutput = self.ftp.storbinary('STOR {}{}'.format(destinationDir, filename), bio)
 		return uploadCommandOutput
 			
 	@classmethod
 	def GetCurrentDirectory(self):
 		return self.ftpDirectory
-
-	#TODO: Add more methods here!
 
 def __init__(self): 
 	pass 

@@ -7,15 +7,27 @@ from kivy.config import Config
 
 Window.clearcolor = (.17,.17,.17,.5)
 Config.set('input', 'mouse', 'mouse,disable_multitouch')
-
-#TODO: Find a way to move these out of the main 
 sm.add_widget(LoginScreen(name = 'login')) 
- 
 
-class FtpClient(App): 
+class Singleton:
+	def __init__(self, decorated):
+		self._decorated = decorated
+	def Instance(self):
+		try:
+			return self._instance
+		except AttributeError:
+			self._instance = self._decorated()
+			return self._instance
+		def __call__(self):
+			raise TypeError('Singletons must be accessed through Instance().')
+		def __instanceCheck(self, inst):
+			return isinstance(inst, self.decorated)
+			
+@Singleton
+class FtpClient(App):
 	def build(self): 
 		return sm 
- 
 
 if __name__ == '__main__': 
-	FtpClient().run() 
+	FtpApplicationRunner = FtpClient.Instance()
+	FtpApplicationRunner.run()

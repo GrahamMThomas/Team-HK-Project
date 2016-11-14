@@ -6,9 +6,9 @@ from kivy.uix.screenmanager import Screen
 from kivy.uix.boxlayout import BoxLayout
 from kivy.uix.popup import Popup
 import time
+import datetime
 
 from kivy.uix.actionbar import *
-
 
 from TransferScreen import TransferScreen 
 from Settings import * 
@@ -83,14 +83,21 @@ class LoginScreen(GridLayout, Screen):
 		
 		self.actionBar = ActionBar()
 		self.actionView = ActionView()
-		self.actionPrevious = ActionPrevious(title = "FTP Application 2016", with_previous = False, app_icon = "", app_icon_width = 1, app_icon_height = 0)
+		self.copyRightSymbol = u"\u00A9"
+		self.actionPrevious = ActionPrevious(title = "TeamHK " + self.copyRightSymbol, with_previous = False, app_icon = "", app_icon_width = 1, app_icon_height = 0)
 		
 		self.actionToggleButton = ActionToggleButton(text = "CONNECTED", group = "ONLY", state = 'down', allow_selection = False,background_color = (1,.2,.2,1), disabled = True, color = (1,.2,.2,1), opacity = 2)
-		
 		self.actionView.add_widget(self.actionPrevious)
 		self.defaultButton = ActionButton(text = "DEFAULT", on_press = self.SetDefaultParameters)
 		self.actionView.add_widget(self.defaultButton)
 		self.actionView.add_widget(self.actionToggleButton)
+
+		self.date_time = str(datetime.datetime.now())
+		self.Date = self.date_time.split()[0]
+		self.Date = datetime.datetime.now().strftime("%m") +  datetime.datetime.now().strftime("-%d") + datetime.datetime.now().strftime("-%Y") 
+		self.actionButtonCurrentDate = ActionButton(text = self.Date)
+		self.actionView.add_widget(self.actionButtonCurrentDate)
+		
 		self.actionBar.add_widget(self.actionView)
 		self.add_widget(self.actionBar)
 		
@@ -123,5 +130,4 @@ class LoginScreen(GridLayout, Screen):
 		self.connectButton.bind(on_press=self.ConnectUsingParameters)
 		self.boxlayoutConnect.add_widget(self.connectButton)
 		self.add_widget(self.boxlayoutConnect)
-			
-		
+						

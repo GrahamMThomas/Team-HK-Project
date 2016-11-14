@@ -8,6 +8,7 @@ from kivy.uix.boxlayout import BoxLayout
 from kivy.lang import Builder
 from kivy.uix.button import Button 
 from kivy.uix.actionbar import *
+from kivy.uix.textinput import TextInput
 
 import os
 
@@ -26,9 +27,12 @@ def pressed(self,instance,cls):
 	print(selected_value_client_side)
 
 currentDirectory = os.getcwd()
-# FIXME: All the global need to go away.
+
 UPLOADBUTTON = Button()
 DOWNLOADBUTTON = Button()
+clientSide = TextInput()
+serverSide = TextInput()
+
 LISTVIEW = ListView()
 LISTADAPTER = ListAdapter(data=[], cls=ListItemButton, sortedKeys=[])
 FILECHOOSER = FileChooserIconView(path=currentDirectory, multiselect = False, on_submit = pressed)
@@ -50,7 +54,7 @@ errorTransferBoxLayout.add_widget(confirmationError)
 popupErrorMessage = Popup(title = "Transfer Status", content = errorTransferBoxLayout, size_hint = (.5,.4))
 
 class TransferScreen(GridLayout, Screen):
-
+	
 	def DownloadFile(self, instance = None):
 		if LISTADAPTER.selection:
 			filename =  FTPConnectionService.GetCurrentDirectory() + (str(LISTADAPTER.selection[0]).split('=')[1])[0:-1]
@@ -68,14 +72,16 @@ class TransferScreen(GridLayout, Screen):
 		selected_value_client_side = FILECHOOSER.selection
 		uploadFileName = None
 		
-		for item in selected_value_client_side:
-			uploadFileName = item
+		for iteratorForItem in selected_value_client_side:
+			uploadFileName = iteratorForItem
+			print("UPLOAD FILE NAME =  %s")%(uploadFileName)
 						
 		if selected_value_client_side:
 			popupErrorMessage.title = "Transfer Status"
 			try:
 				openPopup(FTPConnectionService.Upload(uploadFileName, FTPConnectionService.GetCurrentDirectory()).split(" ")[1:])
 			except error_perm, msg:
+				errorLabelMessage.font_size = 14
 				openPopup((str(msg)).split(" ")[1:])
 		else:
 			popupErrorMessage.title = "Error: File Selection"
@@ -86,14 +92,18 @@ class TransferScreen(GridLayout, Screen):
 	def ListFiles(self, directory = '/', instance = None):
 		#TODO: Add formatting here
 		if LISTADAPTER.selection:
+			print("THIS ====> %s")%(str(LISTADAPTER.selection).split('=')[1])[0:-2]
 			output = FTPConnectionService.FtpListCommand((str(LISTADAPTER.selection).split('=')[1])[0:-2])
 		else:
+			print("DIRECTORY ======> %s")%(directory)
 			output = FTPConnectionService.FtpListCommand(directory)
 		return output
 
 	def ReAddButtons(self,instance = None):
 		global UPLOADBUTTON
 		global DOWNLOADBUTTON
+		global clientSide
+		global serverSide
 
 		UPLOADBUTTON = Button(text='UPLOAD', size_hint_y=None, height=50, on_press = self.UploadFile)
 		self.add_widget(UPLOADBUTTON)
@@ -101,15 +111,24 @@ class TransferScreen(GridLayout, Screen):
 		DOWNLOADBUTTON = Button(text='DOWNLOAD', on_press=self.DownloadFile, size_hint_y=None, height=50)
 		self.add_widget(DOWNLOADBUTTON)
 		
+		clientSide = TextInput(text = "Client", size_hint_y = None, height = 50)
+		self.add_widget(clientSide)
+		serverSide = TextInput(text = "Server", size_hint_y = None, height = 50)
+		self.add_widget(serverSide)
+		
 	def UpdateFtpDirectoryListing(self, instance = None):
 		global LISTVIEW
 		global UPLOADBUTTON
 		global DOWNLOADBUTTON
 		global LISTADAPTER
+		global clientSide
+		global serverSide
 
 		# Removing old widgets
 		self.remove_widget(UPLOADBUTTON)
 		self.remove_widget(DOWNLOADBUTTON)
+		self.remove_widget(clientSide)
+		self.remove_widget(serverSide)
 		self.remove_widget(LISTVIEW)
 		
 		updateList = self.ListFiles()
@@ -125,6 +144,16 @@ class TransferScreen(GridLayout, Screen):
 	def SetClientList(self):
 		pass
 
+	def removePressed(self, temp):
+		if LISTADAPTER.selection:
+			selection = LISTADAPTER.selection[0].text
+			print(selection)
+			LISTADAPTER.data.remove(selection)
+
+	def addPressedClient(self,temp):
+		LISTADAPTER.data.extend([clientSide.text])
+		FTPConnectionService.thisUpload(clientSide.text, FTPConnectionService.GetCurrentDirectory()).split(" ")[1:]
+			
 	#TODO: Implement screen design
  	def __init__(self, **kwargs):
 		global LISTVIEW
@@ -134,7 +163,6 @@ class TransferScreen(GridLayout, Screen):
 		super(TransferScreen, self).__init__(**kwargs) 
 		
 		self.cols = 2
-	
 		self.actionBar = ActionBar()
 		self.actionView = ActionView()
 		self.actionPrevious = ActionPrevious(title = "SETTINGS", with_previous = False, app_icon = "", app_icon_width = 1, app_icon_height = 0)
@@ -146,18 +174,22 @@ class TransferScreen(GridLayout, Screen):
 		self.actionView2.add_widget(self.actionPrevious2)
 		
 		self.listButton = ActionButton(text='List Files', on_press=self.UpdateFtpDirectoryListing, size_hint_y=None, height = 50)
-	
-		self.removeButton = ActionButton(text = "REMOVE FILE")
+		self.removeButton = ActionButton(text = "REMOVE File", on_press = self.removePressed)
+		
 		self.actionView2.add_widget(self.removeButton)
 		self.actionView2.add_widget(self.listButton)
+		self.addButton = ActionButton(text = "ADD File", on_press = self.addPressedClient)
+		self.actionView2.add_widget(self.addButton)
+		
 		self.actionBar.add_widget(self.actionView)
 		self.add_widget(self.actionBar)
 		self.actionBar2.add_widget(self.actionView2)
 		self.add_widget(self.actionBar2) 
+		
 		self.boxLayout = BoxLayout()
 		self.boxLayout.add_widget(FILECHOOSER)
 		self.add_widget(self.boxLayout)
-
+		
 		updateList = self.ListFiles()
 		LISTADAPTER = ListAdapter(data=["{}".format(i) for i in updateList], cls=ListItemButton, sortedKeys=[])
 		LISTVIEW = ListView(adapter=LISTADAPTER)	
