@@ -39,8 +39,10 @@ class FTPConnectionService:
 		ls = []
 		if directory[-1] == '/':
 			try:
-				self.ftp.retrlines('LIST %s' % directory, ls.append)
-				self.ftpDirectory = directory
+				self.ftpDirectory += directory
+				self.ftpDirectory.replace('//','/')
+				print "Directory: {}".format(self.ftpDirectory)
+				self.ftp.retrlines('LIST %s' % self.ftpDirectory, ls.append)
 			except error_perm, msg:
 				errorListingMessage.text = ""
 				parsedErrorMessage = (str(msg)).split(" ")[1:]
@@ -56,6 +58,7 @@ class FTPConnectionService:
 	@classmethod
 	def ListParser(self, ls):
 		files = []
+		print ls
 		for iteratorInFileListing in ls:
 			fileProperties = iteratorInFileListing.split()
 			if fileProperties[2] == '<DIR>' or fileProperties[0][0] == 'd':
