@@ -33,7 +33,24 @@ class FTPConnectionService:
 		except Exception, e: 
 			print "[ERROR] FTP connection failed with error: {}".format(e) 
 			return False 
-
+			
+	@classmethod
+	def FtpBackCommand(self, directory):
+		ls = []
+		self.ftpDirectory = directory
+		lengthOfDirectory = len(directory)
+		if(lengthOfDirectory > 1):
+			secondLast = directory[-2]
+			Last = directory[-1]
+			checkingForBack = secondLast + Last
+			if checkingForBack == '//':
+				self.ftp.retrlines('LIST %s' % self.ftpDirectory, ls.append)
+		
+		else:
+			self.ftp.retrlines('LIST %s' % self.ftpDirectory, ls.append)
+		
+		return self.ListParser(ls)
+						
 	@classmethod 
 	def FtpListCommand(self, directory = '/'):
 		ls = []
@@ -51,10 +68,9 @@ class FTPConnectionService:
 				listingErrorPopup.open()
 		else:
 			self.ftp.retrlines('LIST', ls.append)
-			self.ftpDirectory = '/'
+
 		return self.ListParser(ls)
 
-	# TODO: Fix parser so works on all servers
 	@classmethod
 	def ListParser(self, ls):
 		files = []
@@ -66,6 +82,8 @@ class FTPConnectionService:
 			else:
 				files.append(fileProperties[-1])
 			print(iteratorInFileListing)
+		home_keyword = '..'
+		files.insert(0,home_keyword)
 		return files
 
 	@classmethod
@@ -85,10 +103,16 @@ class FTPConnectionService:
 		print ("Destination Directory = {}{}").format(destinationDir,fileToUpload)
 		f = open(filename, 'rb')
 		uploadCommandOutput = self.ftp.storbinary('STOR {}{}'.format(destinationDir, fileToUpload), f)
-		f.close()
-		
+		f.close()	
 		return uploadCommandOutput
 	
+	@classmethod
+	def thisRemove(self, filename):
+		try:
+			self.ftp.delete(filename)
+		except Exception as ex:
+			print("Error: %s")%(ex)
+				
 	@classmethod
 	def thisUpload(self, filename, destinationDir):
 		bio = io.BytesIO('')
