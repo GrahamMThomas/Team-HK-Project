@@ -5,10 +5,10 @@ from kivy.uix.button import Button
 from kivy.uix.screenmanager import Screen 
 from kivy.uix.boxlayout import BoxLayout
 from kivy.uix.popup import Popup
+from kivy.uix.actionbar import *
+
 import time
 import datetime
-
-from kivy.uix.actionbar import *
 
 from TransferScreen import TransferScreen 
 from Settings import * 
@@ -129,5 +129,4 @@ class LoginScreen(GridLayout, Screen):
 		self.connectButton = Button(text='Connect', font_size = 20, background_color = (.01,.973,.99,1))
 		self.connectButton.bind(on_press=self.ConnectUsingParameters)
 		self.boxlayoutConnect.add_widget(self.connectButton)
-		self.add_widget(self.boxlayoutConnect)
-						
+		self.add_widget(self.boxlayoutConnect)				

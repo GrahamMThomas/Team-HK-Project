@@ -22,7 +22,6 @@ Builder.load_string('''
 ''')
 
 selected_value_client_side = None
-
 def pressed(self,instance,cls):
 	print(selected_value_client_side)
 
@@ -90,13 +89,34 @@ class TransferScreen(GridLayout, Screen):
 	
 	#-------------------------------------------FTP DIRECTORY----------------------------------
 	def ListFiles(self, directory = '/', instance = None):
-		#TODO: Add formatting here
-		if LISTADAPTER.selection:
-			print("THIS ====> %s")%(str(LISTADAPTER.selection).split('=')[1])[0:-2]
-			output = FTPConnectionService.FtpListCommand((str(LISTADAPTER.selection).split('=')[1])[0:-2])
+		home_directory_selection = str(LISTADAPTER.selection)
+		final_conversion_home_directory_selection = ""
+		
+		if LISTADAPTER.selection:		
+			final_conversion_home_directory_selection = home_directory_selection.split(" ")[1].split("=")[1].split(">")[0]
+			output = ""
+			if final_conversion_home_directory_selection != '..':
+				output = FTPConnectionService.FtpListCommand((str(LISTADAPTER.selection).split('=')[1])[0:-2])	
+								
+		if final_conversion_home_directory_selection == '..':
+			extractedDirectories = ''
+			for directoryIterator in str(FTPConnectionService.GetCurrentDirectory()):
+				extractedDirectories = extractedDirectories + directoryIterator
+			
+			parsedExtractedDirectories = []
+			for parsingIterator in extractedDirectories.split('/'):
+				if(parsingIterator !='' and parsingIterator != ' '):
+					parsedExtractedDirectories.append(parsingIterator)
+				
+			directory_pathway = '/'
+			nextDirectory = '//'
+			for pathwayIterator in parsedExtractedDirectories[0:-1]:
+				directory_pathway = directory_pathway + pathwayIterator + nextDirectory
+				
+			output = FTPConnectionService.FtpBackCommand(directory_pathway)
+			
 		else:
-			print("DIRECTORY ======> %s")%(directory)
-			output = FTPConnectionService.FtpListCommand(directory)
+			output = FTPConnectionService.FtpListCommand(directory)			
 		return output
 
 	def ReAddButtons(self,instance = None):
@@ -111,9 +131,9 @@ class TransferScreen(GridLayout, Screen):
 		DOWNLOADBUTTON = Button(text='DOWNLOAD', on_press=self.DownloadFile, size_hint_y=None, height=50)
 		self.add_widget(DOWNLOADBUTTON)
 		
-		clientSide = TextInput(text = "Client", size_hint_y = None, height = 50)
+		clientSide = TextInput(text = "Create new file (CLIENT)", size_hint_y = None, height = 50, disabled = True)
 		self.add_widget(clientSide)
-		serverSide = TextInput(text = "Server", size_hint_y = None, height = 50)
+		serverSide = TextInput(hint_text = "Create new file (SERVER)", size_hint_y = None, height = 50)
 		self.add_widget(serverSide)
 		
 	def UpdateFtpDirectoryListing(self, instance = None):
@@ -124,7 +144,6 @@ class TransferScreen(GridLayout, Screen):
 		global clientSide
 		global serverSide
 
-		# Removing old widgets
 		self.remove_widget(UPLOADBUTTON)
 		self.remove_widget(DOWNLOADBUTTON)
 		self.remove_widget(clientSide)
@@ -143,19 +162,16 @@ class TransferScreen(GridLayout, Screen):
 		
 	def SetClientList(self):
 		pass
-
-	def removePressed(self, temp):
-		if LISTADAPTER.selection:
-			selection = LISTADAPTER.selection[0].text
-			print(selection)
-			LISTADAPTER.data.remove(selection)
-
-	def addPressedClient(self,temp):
-		LISTADAPTER.data.extend([clientSide.text])
-		FTPConnectionService.thisUpload(clientSide.text, FTPConnectionService.GetCurrentDirectory()).split(" ")[1:]
+	
+	def deleting(self, temp):
+		filename =  FTPConnectionService.GetCurrentDirectory() + (str(LISTADAPTER.selection[0]).split('=')[1])[0:-1]
+		FTPConnectionService.thisRemove(filename)
+		
+	def addPressedServer(self,temp):
+		LISTADAPTER.data.extend([serverSide.text])
+		FTPConnectionService.thisUpload(serverSide.text, FTPConnectionService.GetCurrentDirectory()).split(" ")[1:]
 			
-	#TODO: Implement screen design
- 	def __init__(self, **kwargs):
+	def __init__(self, **kwargs):
 		global LISTVIEW
 		global UPLOADBUTTON
 		global DOWNLOADBUTTON
@@ -165,7 +181,7 @@ class TransferScreen(GridLayout, Screen):
 		self.cols = 2
 		self.actionBar = ActionBar()
 		self.actionView = ActionView()
-		self.actionPrevious = ActionPrevious(title = "SETTINGS", with_previous = False, app_icon = "", app_icon_width = 1, app_icon_height = 0)
+		self.actionPrevious = ActionPrevious(title = "Settings", with_previous = False, app_icon = "", app_icon_width = 1, app_icon_height = 0)
 		self.actionView.add_widget(self.actionPrevious)
 		
 		self.actionBar2 = ActionBar()
@@ -174,11 +190,11 @@ class TransferScreen(GridLayout, Screen):
 		self.actionView2.add_widget(self.actionPrevious2)
 		
 		self.listButton = ActionButton(text='List Files', on_press=self.UpdateFtpDirectoryListing, size_hint_y=None, height = 50)
-		self.removeButton = ActionButton(text = "REMOVE File", on_press = self.removePressed)
+		self.removeButton = ActionButton(text = "Remove", on_press = self.deleting)
 		
 		self.actionView2.add_widget(self.removeButton)
 		self.actionView2.add_widget(self.listButton)
-		self.addButton = ActionButton(text = "ADD File", on_press = self.addPressedClient)
+		self.addButton = ActionButton(text = "Create", on_press = self.addPressedServer)
 		self.actionView2.add_widget(self.addButton)
 		
 		self.actionBar.add_widget(self.actionView)
