@@ -131,9 +131,9 @@ class TransferScreen(GridLayout, Screen):
 		DOWNLOADBUTTON = Button(text='DOWNLOAD', on_press=self.DownloadFile, size_hint_y=None, height=50)
 		self.add_widget(DOWNLOADBUTTON)
 		
-		clientSide = TextInput(text = "Create new file (CLIENT)", size_hint_y = None, height = 50, disabled = True)
+		clientSide = TextInput(hint_text = "New File Name (SERVER)", size_hint_y = None, height = 50)
 		self.add_widget(clientSide)
-		serverSide = TextInput(hint_text = "Create new file (SERVER)", size_hint_y = None, height = 50)
+		serverSide = TextInput(hint_text = "Create/Rename(SERVER)", size_hint_y = None, height = 50)
 		self.add_widget(serverSide)
 		
 	def UpdateFtpDirectoryListing(self, instance = None):
@@ -164,13 +164,63 @@ class TransferScreen(GridLayout, Screen):
 		pass
 	
 	def deleting(self, temp):
-		filename =  FTPConnectionService.GetCurrentDirectory() + (str(LISTADAPTER.selection[0]).split('=')[1])[0:-1]
-		FTPConnectionService.thisRemove(filename)
-		
-	def addPressedServer(self,temp):
-		LISTADAPTER.data.extend([serverSide.text])
-		FTPConnectionService.thisUpload(serverSide.text, FTPConnectionService.GetCurrentDirectory()).split(" ")[1:]
+		try:
+			filename =  FTPConnectionService.GetCurrentDirectory() + (str(LISTADAPTER.selection[0]).split('=')[1])[0:-1]
+			isFileRemoved = FTPConnectionService.thisRemove(filename)
+			print("WAS FILE REMOVED ====> ", isFileRemoved)
+			if isFileRemoved == True:
+				popupErrorMessage.title = "Remove Status..."
+				errorLabelMessage.text = (str(LISTADAPTER.selection[0]).split('=')[1])[0:-1] + " was successfully REMOVED"
+				popupErrorMessage.open()
+			else:
+				popupErrorMessage.title = "Remove Status..."
+				errorLabelMessage.text = "Can not remove"
+				popupErrorMessage.open()
 			
+		except IndexError:
+			popupErrorMessage.title = "Empty FIELD..."
+			errorLabelMessage.text = "Can not remove file: NO FILE SELECTED"
+			popupErrorMessage.open()
+					
+	def addPressedServer(self,temp):
+		fileAlreadyExists = False
+		for serverDirectoryIterator in LISTADAPTER.data:
+			if serverSide.text == serverDirectoryIterator:
+				fileAlreadyExists = True
+				
+		if serverSide.text != '' and serverSide.text != ' ' and fileAlreadyExists == False:	
+			try:
+				LISTADAPTER.data.extend([serverSide.text])
+				FTPConnectionService.thisUpload(serverSide.text, FTPConnectionService.GetCurrentDirectory()).split(" ")[1:]
+			except Exception as ex:
+				popupErrorMessage.title = "Creating New File (SERVER)"
+				errorLabelMessage.text = "Error 550: ACCESS DENIED"
+				popupErrorMessage.open()
+					
+		elif fileAlreadyExists == True:
+			popupErrorMessage.title = "Creating New File (SERVER)"
+			errorLabelMessage.text = "File ALREADY EXISTS"
+			popupErrorMessage.open()			
+			
+		else:
+			popupErrorMessage.title = "Creating New File (SERVER)"
+			errorLabelMessage.text = "File needs name: EMPTY TEXT FIELD"
+			popupErrorMessage.open()
+			
+	def renameServerSide(self, temp):
+		renameFileSuccessful = False
+		oldFileName = FTPConnectionService.GetCurrentDirectory() + serverSide.text
+		newFileName = FTPConnectionService.GetCurrentDirectory() + clientSide.text
+		renameFileSuccessful = FTPConnectionService.renameFile(oldFileName, newFileName)
+		if renameFileSuccessful == True:
+			popupErrorMessage.title = "Renaming File (SERVER)"
+			errorLabelMessage.text = serverSide.text + " renamed to " + clientSide.text
+			popupErrorMessage.open()
+		else:
+			popupErrorMessage.title = "Renaming File (SERVER)"
+			errorLabelMessage.text = "Error: Could not rename, UNSUCCESSFUL"
+			popupErrorMessage.open()
+		
 	def __init__(self, **kwargs):
 		global LISTVIEW
 		global UPLOADBUTTON
@@ -183,7 +233,7 @@ class TransferScreen(GridLayout, Screen):
 		self.actionView = ActionView()
 		self.actionPrevious = ActionPrevious(title = "Settings", with_previous = False, app_icon = "", app_icon_width = 1, app_icon_height = 0)
 		self.actionView.add_widget(self.actionPrevious)
-		
+				
 		self.actionBar2 = ActionBar()
 		self.actionView2 = ActionView()
 		self.actionPrevious2 = ActionPrevious(title = "", with_previous = False, app_icon = "", app_icon_width = 1, app_icon_height = 0)
@@ -192,6 +242,10 @@ class TransferScreen(GridLayout, Screen):
 		self.listButton = ActionButton(text='List Files', on_press=self.UpdateFtpDirectoryListing, size_hint_y=None, height = 50)
 		self.removeButton = ActionButton(text = "Remove", on_press = self.deleting)
 		
+		self.renameButton = ActionButton(text='Rename', size_hint_y=None, height = 50)
+		self.renameButton.bind(on_press = self.renameServerSide)
+			
+		self.actionView.add_widget(self.renameButton)	
 		self.actionView2.add_widget(self.removeButton)
 		self.actionView2.add_widget(self.listButton)
 		self.addButton = ActionButton(text = "Create", on_press = self.addPressedServer)
