@@ -110,15 +110,26 @@ class FTPConnectionService:
 	def thisRemove(self, filename):
 		try:
 			self.ftp.delete(filename)
+			return True
 		except Exception as ex:
 			print("Error: %s")%(ex)
+			return False
 				
 	@classmethod
 	def thisUpload(self, filename, destinationDir):
 		bio = io.BytesIO('')
 		uploadCommandOutput = self.ftp.storbinary('STOR {}{}'.format(destinationDir, filename), bio)
 		return uploadCommandOutput
-			
+	
+	@classmethod
+	def renameFile(self, currentFileName, newFileName):
+		try:
+			self.ftp.rename(currentFileName, newFileName)
+			return True
+		except Exception as ex:
+			print("Error: ", ex)
+			return False
+				
 	@classmethod
 	def GetCurrentDirectory(self):
 		return self.ftpDirectory
