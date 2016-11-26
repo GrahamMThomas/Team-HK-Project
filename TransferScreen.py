@@ -9,11 +9,10 @@ from kivy.lang import Builder
 from kivy.uix.button import Button 
 from kivy.uix.actionbar import *
 from kivy.uix.textinput import TextInput
-
-import os
-
 from Settings import * 
 from HKftp import * 
+import os
+
 
 Builder.load_string('''
 <ListItemButton>:
@@ -22,9 +21,6 @@ Builder.load_string('''
 ''')
 
 selected_value_client_side = None
-def pressed(self,instance,cls):
-	print(selected_value_client_side)
-
 currentDirectory = os.getcwd()
 
 UPLOADBUTTON = Button()
@@ -34,7 +30,7 @@ serverSide = TextInput()
 
 LISTVIEW = ListView()
 LISTADAPTER = ListAdapter(data=[], cls=ListItemButton, sortedKeys=[])
-FILECHOOSER = FileChooserIconView(path=currentDirectory, multiselect = False, on_submit = pressed)
+FILECHOOSER = FileChooserIconView(path=currentDirectory, multiselect = False)
 
 def closeDownloadPopup(self):
 	popupErrorMessage.dismiss()
@@ -65,7 +61,6 @@ class TransferScreen(GridLayout, Screen):
 		else:
 			popupErrorMessage.title = "Error: File Selection"
 			openPopup("No File Selected")
-			print "Error: No file selected FROM DOWNLOAD SIDE"
 	
 	def UploadFile(self, instance = None):
 		selected_value_client_side = FILECHOOSER.selection
@@ -73,7 +68,6 @@ class TransferScreen(GridLayout, Screen):
 		
 		for iteratorForItem in selected_value_client_side:
 			uploadFileName = iteratorForItem
-			print("UPLOAD FILE NAME =  %s")%(uploadFileName)
 						
 		if selected_value_client_side:
 			popupErrorMessage.title = "Transfer Status"
@@ -85,9 +79,7 @@ class TransferScreen(GridLayout, Screen):
 		else:
 			popupErrorMessage.title = "Error: File Selection"
 			openPopup("No File Selected")
-			print("Error: No file selected FROM UPLOAD SIDE")
 	
-	#-------------------------------------------FTP DIRECTORY----------------------------------
 	def ListFiles(self, directory = '/', instance = None):
 		home_directory_selection = str(LISTADAPTER.selection)
 		final_conversion_home_directory_selection = ""
@@ -157,7 +149,6 @@ class TransferScreen(GridLayout, Screen):
 		self.ReAddButtons()
 
 	def OnSwitch(self):
-		#TODO: Add more method needed on screen switch 
 		self.SetClientList() 
 		
 	def SetClientList(self):
@@ -167,7 +158,6 @@ class TransferScreen(GridLayout, Screen):
 		try:
 			filename =  FTPConnectionService.GetCurrentDirectory() + (str(LISTADAPTER.selection[0]).split('=')[1])[0:-1]
 			isFileRemoved = FTPConnectionService.thisRemove(filename)
-			print("WAS FILE REMOVED ====> ", isFileRemoved)
 			if isFileRemoved == True:
 				popupErrorMessage.title = "Remove Status..."
 				errorLabelMessage.text = (str(LISTADAPTER.selection[0]).split('=')[1])[0:-1] + " was successfully REMOVED"

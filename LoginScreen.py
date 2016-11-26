@@ -6,13 +6,11 @@ from kivy.uix.screenmanager import Screen
 from kivy.uix.boxlayout import BoxLayout
 from kivy.uix.popup import Popup
 from kivy.uix.actionbar import *
-
-import time
-import datetime
-
 from TransferScreen import TransferScreen 
 from Settings import * 
 from HKftp import * 
+import time
+import datetime
 
 def closeErrorPopupLogin(self):
 	errorPopupLogin.dismiss()
@@ -27,7 +25,7 @@ errorPopupLogin = Popup(title = "Error: INFORMATION", content = popupBoxLayout, 
 class LoginScreen(GridLayout, Screen): 
 	def ConnectUsingParameters(self, instance): 	
 		
-		if self.host.text == '': #If no host is selected use default. 
+		if self.host.text == '': 
 			self.host.background_color = (1,.2,.2,1)
 		else:
 			self.host.background_color = (1,1,1,1)
@@ -62,22 +60,14 @@ class LoginScreen(GridLayout, Screen):
 			errorPopupLogin.title = "Error: EMPTY Fields"
 			errorPopupLogin.open()
 								
-	@staticmethod 
+	@staticmethod
 	def SwitchToTransferScreen(): 
-		print "Switching to Transfer Screen..." 
 		transferScreen = TransferScreen(name='transfer') 
 		transferScreen.OnSwitch() 
 		sm.add_widget(transferScreen) 
 		sm.current = 'transfer' 
-			
-	def SetDefaultParameters(self, instance): 
-		self.host.text = 'localhost' 
-		self.port.text = '21' 
-		self.username.text = 'IEUser' 
-		self.password.text = 'Passw0rd!'
-	
+				
 	def __init__(self, **kwargs):
-        #TODO: Separate these elements into a nicer format
 		super(LoginScreen, self).__init__(**kwargs) 
 		self.cols = 1
 		
@@ -88,14 +78,12 @@ class LoginScreen(GridLayout, Screen):
 		
 		self.actionToggleButton = ActionToggleButton(text = "CONNECTED", group = "ONLY", state = 'down', allow_selection = False,background_color = (1,.2,.2,1), disabled = True, color = (1,.2,.2,1), opacity = 2)
 		self.actionView.add_widget(self.actionPrevious)
-		self.defaultButton = ActionButton(text = "DEFAULT", on_press = self.SetDefaultParameters)
-		self.actionView.add_widget(self.defaultButton)
 		self.actionView.add_widget(self.actionToggleButton)
 
 		self.date_time = str(datetime.datetime.now())
 		self.Date = self.date_time.split()[0]
 		self.Date = datetime.datetime.now().strftime("%m") +  datetime.datetime.now().strftime("-%d") + datetime.datetime.now().strftime("-%Y") 
-		self.actionButtonCurrentDate = ActionButton(text = self.Date)
+		self.actionButtonCurrentDate = ActionButton(text = self.Date, disabled = True, opacity = 3, background_color = (1,0,1,1))
 		self.actionView.add_widget(self.actionButtonCurrentDate)
 		
 		self.actionBar.add_widget(self.actionView)
@@ -129,4 +117,4 @@ class LoginScreen(GridLayout, Screen):
 		self.connectButton = Button(text='Connect', font_size = 20, background_color = (.01,.973,.99,1))
 		self.connectButton.bind(on_press=self.ConnectUsingParameters)
 		self.boxlayoutConnect.add_widget(self.connectButton)
-		self.add_widget(self.boxlayoutConnect)				
+		self.add_widget(self.boxlayoutConnect)		
