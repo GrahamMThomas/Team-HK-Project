@@ -28,10 +28,8 @@ class FTPConnectionService:
 		try: 
 			self.ftp.connect(host, int(port)) 
 			messageReceivedForLoginInformation = self.ftp.login(username, password) 
-			print "FTP login received: {}".format(messageReceivedForLoginInformation) 
 			return True 
 		except Exception, e: 
-			print "[ERROR] FTP connection failed with error: {}".format(e) 
 			return False 
 			
 	@classmethod
@@ -58,7 +56,6 @@ class FTPConnectionService:
 			try:
 				self.ftpDirectory += directory
 				self.ftpDirectory.replace('//','/')
-				print "Directory: {}".format(self.ftpDirectory)
 				self.ftp.retrlines('LIST %s' % self.ftpDirectory, ls.append)
 			except error_perm, msg:
 				errorListingMessage.text = ""
@@ -74,14 +71,12 @@ class FTPConnectionService:
 	@classmethod
 	def ListParser(self, ls):
 		files = []
-		print ls
 		for iteratorInFileListing in ls:
 			fileProperties = iteratorInFileListing.split()
 			if fileProperties[2] == '<DIR>' or fileProperties[0][0] == 'd':
 				files.append("%s/" % fileProperties[-1])
 			else:
 				files.append(fileProperties[-1])
-			print(iteratorInFileListing)
 		home_keyword = '..'
 		files.insert(0,home_keyword)
 		return files
@@ -90,7 +85,6 @@ class FTPConnectionService:
 	def Download(self, filename, destinationDir):
 		if destinationDir[-1] != '\\':
 			destinationDir += '\\'
-		print "Downloading {0} to {1}{0}".format(filename.split('/')[-1],destinationDir)
 		try:
 			return self.ftp.retrbinary('RETR %s' % filename, open('{1}{0}'.format(filename.split('/')[-1], destinationDir), 'wb').write)
 		except IOError as err:
@@ -99,8 +93,6 @@ class FTPConnectionService:
 	@classmethod
 	def Upload(self, filename, destinationDir):
 		fileToUpload = filename.split('\\')[-1]
-		print ("Uploading %s to %s")%(filename, destinationDir)
-		print ("Destination Directory = {}{}").format(destinationDir,fileToUpload)
 		f = open(filename, 'rb')
 		uploadCommandOutput = self.ftp.storbinary('STOR {}{}'.format(destinationDir, fileToUpload), f)
 		f.close()	
@@ -112,7 +104,6 @@ class FTPConnectionService:
 			self.ftp.delete(filename)
 			return True
 		except Exception as ex:
-			print("Error: %s")%(ex)
 			return False
 				
 	@classmethod
@@ -127,7 +118,6 @@ class FTPConnectionService:
 			self.ftp.rename(currentFileName, newFileName)
 			return True
 		except Exception as ex:
-			print("Error: ", ex)
 			return False
 				
 	@classmethod
