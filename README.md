@@ -32,7 +32,7 @@ FTP server, and removing file on FTP server.
 
 
 **Information Regarding** | **Link**
--------------------------  ----------
+------------------------- | ----------
 Kivy					  |(https://kivy.org/#home)
 Python					  |(https://www.python.org/)
 What is an FTP? 		  |(https://www.wired.com/2010/02/ftp_for_beginners/)
